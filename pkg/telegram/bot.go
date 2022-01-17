@@ -2,25 +2,29 @@ package telegram
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/zhashkevych/go-pocket-sdk"
 	"log"
 )
 
 type Bot struct {
-	bot *tgbotapi.BotAPI
+	bot          *tgbotapi.BotAPI
+	pocketClient *pocket.Client
+	redirectURL  string
 }
 
-func NewBot(bot *tgbotapi.BotAPI) *Bot {
-	return &Bot{bot: bot}
+func NewBot(bot *tgbotapi.BotAPI, pocketClient *pocket.Client, redirectURL string) *Bot {
+	return &Bot{
+		bot:          bot,
+		pocketClient: pocketClient,
+		redirectURL:  redirectURL,
+	}
 }
 
 //публичный метод для запуска бота
 func (b *Bot) Start() error {
 	log.Printf("Authorized on account %s", b.bot.Self.UserName)
 
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-
-	updates, err := b.bot.GetUpdatesChan(u)
+	updates, err := b.initUpdateChannel()
 
 	if err != nil {
 		return err
@@ -33,13 +37,20 @@ func (b *Bot) Start() error {
 
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
-		if update.Message != nil { // If we got a message
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-			//msg.ReplyToMessageID = update.Message.MessageID //bot отвечает на конкретное сообщение
-
-			b.bot.Send(msg)
+		if update.Message == nil { // Ignore any non-Message Updates
+			continue
 		}
+		if update.Message.IsCommand() { // возвращает булево значение, если пришла команда, то true
+			b.handleCommand(update.Message)
+			continue //обработали сообщение и вышли из цикла, чтобы случайно дважды не обработать 1 сообщение с разными условиями
+		}
+		b.handleMessage(update.Message)
 	}
+}
+
+func (b *Bot) initUpdateChannel() (tgbotapi.UpdatesChannel, error) {
+	u := tgbotapi.NewUpdate(0)
+	u.Timeout = 60
+
+	return b.bot.GetUpdatesChan(u)
 }
