@@ -11,14 +11,14 @@ import (
 )
 
 func main() {
-	bot, err := tgbotapi.NewBotAPI("5093299868:AAE7nxh_f6gvINfsf6b9GRBBRCNoXorfHeg")
+	bot, err := tgbotapi.NewBotAPI("")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	bot.Debug = true
 
-	pocketClient, err := pocket.NewClient("100444-0b1e0dbf81a68e1dfac3ad0")
+	pocketClient, err := pocket.NewClient("")
 	if err != nil {
 		log.Fatal(err)
 	}
