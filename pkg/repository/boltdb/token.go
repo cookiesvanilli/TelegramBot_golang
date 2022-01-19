@@ -31,9 +31,9 @@ func (r *TokenRepository) Get(chatID int64, bucket repository.Bucket) (string, e
 		token = string(data)
 		return nil
 	})
-	if err != nil {
+	/*if err != nil {
 		return "", err
-	}
+	}*/
 
 	if token == "" {
 		return "", errors.New("Token not found")
