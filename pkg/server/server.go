@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/repository"
 	"github.com/zhashkevych/go-pocket-sdk"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -43,6 +44,7 @@ func (s *AuthorizationServer) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
 	requestToken, err := s.tokenRepository.Get(chatID, repository.RequestTokens)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -61,6 +63,8 @@ func (s *AuthorizationServer) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	log.Printf("chat_id: %d\nrequest_token: %s\naccess_token: %s\n", chatID, requestToken, authResp.AccessToken)
 
 	w.Header().Add("Location", s.redirectURL)
 	w.WriteHeader(http.StatusMovedPermanently)

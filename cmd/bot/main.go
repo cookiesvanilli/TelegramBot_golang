@@ -4,6 +4,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/repository"
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/repository/boltdb"
+	"github.com/cookiesvanilli/TelegramBot_golang/pkg/server"
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/telegram"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/zhashkevych/go-pocket-sdk"
@@ -30,8 +31,16 @@ func main() {
 
 	tokenRepository := boltdb.NewTokenRepository(db)
 
-	telegramBot := telegram.NewBot(bot, pocketClient, tokenRepository, "http://localhost:8000")
-	if err := telegramBot.Start(); err != nil {
+	telegramBot := telegram.NewBot(bot, pocketClient, tokenRepository, "http://localhost/")
+
+	authorizationServer := server.NewAuthorizationServer(pocketClient, tokenRepository, "https://t.me/Phenr_bot")
+	go func() {
+		if err := telegramBot.Start(); err != nil { //метод старт блокирующая операция, но горутина разрешает эту проблему
+			log.Fatal(err)
+		}
+	}()
+
+	if err := authorizationServer.Start(); err != nil {
 		log.Fatal(err)
 	}
 }
