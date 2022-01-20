@@ -44,10 +44,14 @@ func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 			continue
 		}
 		if update.Message.IsCommand() { // возвращает булево значение, если пришла команда, то true
-			b.handleCommand(update.Message)
+			if err := b.handleCommand(update.Message); err != nil {
+				b.handleError(update.Message.Chat.ID, err)
+			}
 			continue //обработали сообщение и вышли из цикла, чтобы случайно дважды не обработать 1 сообщение с разными условиями
 		}
-		b.handleMessage(update.Message)
+		if err := b.handleMessage(update.Message); err != nil {
+			b.handleError(update.Message.Chat.ID, err)
+		}
 	}
 }
 

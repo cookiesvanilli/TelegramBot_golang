@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/boltdb/bolt"
+	"github.com/cookiesvanilli/TelegramBot_golang/pkg/config"
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/repository"
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/repository/boltdb"
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/server"
@@ -12,6 +13,12 @@ import (
 )
 
 func main() {
+	cfg, err := config.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(cfg)
+
 	bot, err := tgbotapi.NewBotAPI("")
 	if err != nil {
 		log.Fatal(err)
