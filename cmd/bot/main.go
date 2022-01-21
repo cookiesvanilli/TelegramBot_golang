@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/boltdb/bolt"
-	"github.com/cookiesvanilli/TelegramBot_golang/pkg/config"
+	"github.com/cookiesvanilli/TelegramBot_golang/pkg/configs"
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/repository"
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/repository/boltdb"
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/server"
@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	cfg, err := config.Init()
+	cfg, err := configs.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func main() {
 	}
 }
 
-func initDB(cfg *config.Config) (*bolt.DB, error) {
+func initDB(cfg *configs.Config) (*bolt.DB, error) {
 	//create DB
 	db, err := bolt.Open(cfg.DBPath, 0600, nil)
 	if err != nil {

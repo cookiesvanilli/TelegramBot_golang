@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	"github.com/spf13/viper"
@@ -36,7 +36,7 @@ type Responses struct {
 
 func Init() (*Config, error) {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
+	viper.SetConfigName("main")
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
