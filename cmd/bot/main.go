@@ -30,7 +30,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db, err := initDB()
+	db, err := initDB(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,9 +51,9 @@ func main() {
 	}
 }
 
-func initDB() (*bolt.DB, error) {
+func initDB(cfg *config.Config) (*bolt.DB, error) {
 	//create DB
-	db, err := bolt.Open("bot.db", 0600, nil)
+	db, err := bolt.Open(cfg.DBPath, 0600, nil)
 	if err != nil {
 		return nil, err
 	}
