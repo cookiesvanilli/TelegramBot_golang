@@ -19,28 +19,28 @@ func main() {
 	}
 	log.Println(cfg)
 
-	bot, err := tgbotapi.NewBotAPI("")
+	bot, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	bot.Debug = true
 
-	pocketClient, err := pocket.NewClient("")
+	pocketClient, err := pocket.NewClient(cfg.PocketConsumerKey)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	db, err := initDB()
+	db, err := initDB(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	tokenRepository := boltdb.NewTokenRepository(db)
 
-	telegramBot := telegram.NewBot(bot, pocketClient, tokenRepository, "http://localhost/")
+	telegramBot := telegram.NewBot(bot, pocketClient, tokenRepository, cfg.AuthServerURL, cfg.Messages)
 
-	authorizationServer := server.NewAuthorizationServer(pocketClient, tokenRepository, "https://t.me/Phenr_bot")
+	authorizationServer := server.NewAuthorizationServer(pocketClient, tokenRepository, cfg.TelegramBotURL)
 	go func() {
 		if err := telegramBot.Start(); err != nil { //метод старт блокирующая операция, но горутина разрешает эту проблему
 			log.Fatal(err)
@@ -52,9 +52,9 @@ func main() {
 	}
 }
 
-func initDB() (*bolt.DB, error) {
+func initDB(cfg *config.Config) (*bolt.DB, error) {
 	//create DB
-	db, err := bolt.Open("bot.db", 0600, nil)
+	db, err := bolt.Open(cfg.DBPath, 0600, nil)
 	if err != nil {
 		return nil, err
 	}

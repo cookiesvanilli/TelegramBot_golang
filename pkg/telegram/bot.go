@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"github.com/cookiesvanilli/TelegramBot_golang/pkg/config"
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/repository"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/zhashkevych/go-pocket-sdk"
@@ -12,18 +13,21 @@ type Bot struct {
 	pocketClient    *pocket.Client
 	tokenRepository repository.TokenRepository
 	redirectURL     string
+
+	messages config.Messages
 }
 
-func NewBot(bot *tgbotapi.BotAPI, pocketClient *pocket.Client, tr repository.TokenRepository, redirectURL string) *Bot {
+func NewBot(bot *tgbotapi.BotAPI, pocketClient *pocket.Client, tr repository.TokenRepository, redirectURL string, messages config.Messages) *Bot {
 	return &Bot{
 		bot:             bot,
 		pocketClient:    pocketClient,
 		tokenRepository: tr,
 		redirectURL:     redirectURL,
+		messages:        messages,
 	}
 }
 
-//публичный метод для запуска бота
+// Публичный метод для запуска бота
 func (b *Bot) Start() error {
 	log.Printf("Authorized on account %s", b.bot.Self.UserName)
 

@@ -2,22 +2,22 @@ package config
 
 import (
 	"github.com/spf13/viper"
-	"os"
 )
+
+type Messages struct {
+	Errors
+	Responses
+}
 
 type Config struct {
 	TelegramToken     string
 	PocketConsumerKey string
 	AuthServerURL     string
-	TelegramBotURL    string `mapstructure:"bot_url"`
-	DBPath            string `mapstructure:"db_file"`
+
+	TelegramBotURL string `mapstructure:"bot_url"`
+	DBPath         string `mapstructure:"db_file"`
 
 	Messages Messages
-}
-
-type Messages struct {
-	Errors
-	Responses
 }
 
 type Errors struct {
@@ -59,15 +59,10 @@ func Init() (*Config, error) {
 	}
 
 	return &cfg, nil
-
 }
 
 //парсим переменные окружения
 func parseEnv(cfg *Config) error {
-	os.Setenv("TOKEN", "")
-	os.Setenv("CONSUMER_KEY", "")
-	os.Setenv("AUTH_SERVER_URL", "http://localhost/")
-
 	if err := viper.BindEnv("token"); err != nil {
 		return err
 	}
