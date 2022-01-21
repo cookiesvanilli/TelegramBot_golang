@@ -8,9 +8,7 @@ import (
 )
 
 const (
-	commandStart           = "start"
-	replyStart             = "Привет! Чтобы вставить ссылки в своём Pocket аккаунте, необходимо дать разрешение на доступ этому боту. Для этого переходи по ссылке: \n%s"
-	replyAlreadyAuthorized = "Вы уже авторизированны. Пришлите ссылку, а я её сохраню"
+	commandStart = "start"
 )
 
 func (b *Bot) handleCommand(message *tgbotapi.Message) error {
@@ -43,7 +41,7 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 		return errUnableToSave
 	}
 
-	msg := tgbotapi.NewMessage(message.Chat.ID, "Ссылка успешно сохранена")
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.Responses.SavedSuccessfully)
 	//msg.ReplyToMessageID = message.MessageID //bot отвечает на конкретное сообщение
 
 	_, err = b.bot.Send(msg)
@@ -56,13 +54,13 @@ func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
 		return b.initAuthProcess(message)
 	}
 
-	msg := tgbotapi.NewMessage(message.Chat.ID, replyAlreadyAuthorized)
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.Responses.AlreadyAuthorized)
 	_, err = b.bot.Send(msg)
 	return err
 }
 
 func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, "Я не знаю такой команды")
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.messages.Responses.UnknownCommand)
 	_, err := b.bot.Send(msg)
 	return err
 }

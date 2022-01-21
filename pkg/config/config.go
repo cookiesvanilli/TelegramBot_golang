@@ -2,18 +2,7 @@ package config
 
 import (
 	"github.com/spf13/viper"
-	"os"
 )
-
-type Config struct {
-	TelegramToken     string
-	PocketConsumerKey string
-	AuthServerURL     string
-	TelegramBotURL    string `mapstructure:"bot_url"`
-	DBPath            string `mapstructure:"db_file"`
-
-	Messages Messages
-}
 
 type Messages struct {
 	Errors
@@ -34,40 +23,53 @@ type Responses struct {
 	UnknownCommand    string `mapstructure:"unknown_command"`
 }
 
+type Config struct {
+	TelegramToken     string
+	PocketConsumerKey string
+	AuthServerURL     string
+
+	TelegramBotURL string `mapstructure:"bot_url"`
+	DBPath         string `mapstructure:"db_file"`
+
+	Messages Messages
+}
+
 func Init() (*Config, error) {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
+	viper.SetConfigName("main")
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
 	}
 	var cfg Config
-	if err := viper.Unmarshal(&cfg); err != nil {
+	if err := unmarshal(&cfg); err != nil {
 		return nil, err
 	}
-
-	if err := viper.UnmarshalKey("messages.responses", &cfg.Messages.Responses); err != nil {
-		return nil, err
-	}
-
-	if err := viper.UnmarshalKey("messages.errors", &cfg.Messages.Errors); err != nil {
-		return nil, err
-	}
-
 	if err := parseEnv(&cfg); err != nil {
 		return nil, err
 	}
 
 	return &cfg, nil
+}
 
+func unmarshal(cfg *Config) error {
+	if err := viper.Unmarshal(&cfg); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("messages.responses", &cfg.Messages.Responses); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("messages.errors", &cfg.Messages.Errors); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 //парсим переменные окружения
 func parseEnv(cfg *Config) error {
-	os.Setenv("TOKEN", "")
-	os.Setenv("CONSUMER_KEY", "")
-	os.Setenv("AUTH_SERVER_URL", "http://localhost/")
-
 	if err := viper.BindEnv("token"); err != nil {
 		return err
 	}

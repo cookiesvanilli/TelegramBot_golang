@@ -17,16 +17,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(cfg)
 
-	bot, err := tgbotapi.NewBotAPI("")
+	bot, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	bot.Debug = true
 
-	pocketClient, err := pocket.NewClient("")
+	pocketClient, err := pocket.NewClient(cfg.PocketConsumerKey)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,16 +37,16 @@ func main() {
 
 	tokenRepository := boltdb.NewTokenRepository(db)
 
-	telegramBot := telegram.NewBot(bot, pocketClient, tokenRepository, "http://localhost/")
+	telegramBot := telegram.NewBot(bot, pocketClient, tokenRepository, cfg.AuthServerURL, cfg.Messages)
 
-	authorizationServer := server.NewAuthorizationServer(pocketClient, tokenRepository, "https://t.me/Phenr_bot")
+	authorizationServer := server.NewAuthorizationServer(pocketClient, tokenRepository, cfg.TelegramBotURL)
 	go func() {
-		if err := telegramBot.Start(); err != nil { //метод старт блокирующая операция, но горутина разрешает эту проблему
+		if err := authorizationServer.Start(); err != nil { //метод старт блокирующая операция, но горутина разрешает эту проблему
 			log.Fatal(err)
 		}
 	}()
 
-	if err := authorizationServer.Start(); err != nil {
+	if err := telegramBot.Start(); err != nil {
 		log.Fatal(err)
 	}
 }

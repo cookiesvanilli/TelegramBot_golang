@@ -13,7 +13,7 @@ func (b *Bot) initAuthProcess(message *tgbotapi.Message) error {
 		return err
 	}
 
-	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf(replyStart, authLink))
+	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf(b.messages.Responses.Start, authLink))
 	_, err = b.bot.Send(msg)
 	return err
 }
@@ -24,7 +24,7 @@ func (b *Bot) getAccessToken(chatID int64) (string, error) {
 
 func (b *Bot) generateAuthorizationLink(chatID int64) (string, error) {
 	redirectURL := b.generateRedirectURL(chatID)
-	requestToken, err := b.pocketClient.GetRequestToken(context.Background(), redirectURL)
+	requestToken, err := b.pocketClient.GetRequestToken(context.Background(), b.redirectURL)
 	if err != nil {
 		return "", err
 	}
