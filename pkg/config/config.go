@@ -1,19 +1,8 @@
-package configs
+package config
 
 import (
 	"github.com/spf13/viper"
-	"os"
 )
-
-type Config struct {
-	TelegramToken     string
-	PocketConsumerKey string
-	AuthServerURL     string
-	TelegramBotURL    string `mapstructure:"bot_url"`
-	DBPath            string `mapstructure:"db_file"`
-
-	Messages Messages
-}
 
 type Messages struct {
 	Errors
@@ -34,14 +23,26 @@ type Responses struct {
 	UnknownCommand    string `mapstructure:"unknown_command"`
 }
 
+type Config struct {
+	Token             string
+	PocketConsumerKey string
+	AuthServerURL     string
+	TelegramBotURL    string `mapstructure:"bot_url"`
+	DBPath            string `mapstructure:"db_file"`
+
+	Messages Messages
+}
+
 func Init() (*Config, error) {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("main")
+	if err := setUpViper(); err != nil {
+		return nil, err
+	}
+	var cfg Config
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
 	}
-	var cfg Config
+
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
@@ -64,25 +65,31 @@ func Init() (*Config, error) {
 
 //парсим переменные окружения
 func parseEnv(cfg *Config) error {
-	os.Setenv("TOKEN", "")
-	os.Setenv("CONSUMER_KEY", "")
-	os.Setenv("AUTH_SERVER_URL", "http://localhost/")
 
 	if err := viper.BindEnv("token"); err != nil {
 		return err
 	}
 
+	cfg.Token = viper.GetString("token")
+
 	if err := viper.BindEnv("consumer_key"); err != nil {
 		return err
 	}
+
+	cfg.PocketConsumerKey = viper.GetString("consumer_key")
 
 	if err := viper.BindEnv("auth_server_url"); err != nil {
 		return err
 	}
 
-	cfg.TelegramToken = viper.GetString("token")
-	cfg.PocketConsumerKey = viper.GetString("consumer_key")
 	cfg.AuthServerURL = viper.GetString("auth_server_url")
 
 	return nil
+}
+
+func setUpViper() error {
+	viper.AddConfigPath("configs")
+	viper.SetConfigName("main")
+
+	return viper.ReadInConfig()
 }

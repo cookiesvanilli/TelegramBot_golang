@@ -1,7 +1,7 @@
 package telegram
 
 import (
-	"github.com/cookiesvanilli/TelegramBot_golang/pkg/configs"
+	"github.com/cookiesvanilli/TelegramBot_golang/pkg/config"
 	"github.com/cookiesvanilli/TelegramBot_golang/pkg/repository"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/zhashkevych/go-pocket-sdk"
@@ -14,10 +14,10 @@ type Bot struct {
 	tokenRepository repository.TokenRepository
 	redirectURL     string
 
-	messages configs.Messages
+	messages config.Messages
 }
 
-func NewBot(bot *tgbotapi.BotAPI, pocketClient *pocket.Client, tr repository.TokenRepository, redirectURL string, messages configs.Messages) *Bot {
+func NewBot(bot *tgbotapi.BotAPI, pocketClient *pocket.Client, tr repository.TokenRepository, redirectURL string, messages config.Messages) *Bot {
 	return &Bot{
 		bot:             bot,
 		pocketClient:    pocketClient,
